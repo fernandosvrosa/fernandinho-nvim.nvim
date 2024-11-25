@@ -678,7 +678,9 @@ require('lazy').setup({
   {
     'nvim-neotest/neotest',
     dependencies = {
+      'nvim-neotest/nvim-nio',
       'nvim-lua/plenary.nvim',
+      'antoinemadec/FixCursorHold.nvim',
       'nvim-treesitter/nvim-treesitter',
       'nvim-neotest/neotest-go',
     },
@@ -687,13 +689,6 @@ require('lazy').setup({
       require('neotest').setup {
         adapters = {
           require 'neotest-go',
-        },
-        output_panel = {
-          enabled = true,
-          open = 'botright split | resize 15',
-        },
-        quickfix = {
-          open = false,
         },
       }
       vim.keymap.set('n', '<leader>tt', "<cmd>lua require('neotest').run.run()<CR>", { desc = 'Run Test' })
@@ -815,7 +810,15 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          -- ['<C-y>'] = cmp.mapping.confirm { select = true },
+
+          ['<CR>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.confirm { select = false }
+            else
+              fallback() -- Comportamento padrão do Enter
+            end
+          end, { 'i', 's' }),
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
